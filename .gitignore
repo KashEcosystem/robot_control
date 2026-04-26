@@ -1,0 +1,15 @@
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
+
+# Images debug
+*.jpg
+
+# VSCode
+.vscode/
+
+# OS
+.DS_Store
