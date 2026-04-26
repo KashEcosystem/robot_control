@@ -1,3 +1,17 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Settings:
+    TELEGRAM_ENABLED = os.getenv("TELEGRAM_ENABLED", "false").lower() == "true"
+    TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
+    TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "")
+    ROBOT_NAME = os.getenv("ROBOT_NAME", "robot")
+
+settings = Settings()
+
+
 # TEST MODE
 MODE = "SIMULATION"
 #MODE = "SAFE"
