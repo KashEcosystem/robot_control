@@ -8,6 +8,8 @@ from logic.scanner import scan_step
 from logic.obstacle import update_obstacle_state, avoid_obstacle_step
 from logic.visualize import draw_debug
 from logic.execute import apply_output
+from core.alert import send_alert
+from core.trace import RobotTrace
 
 from core.logger_config import logger
 
@@ -40,28 +42,47 @@ MODE_HANDLERS = {
 def run_step(state):
     frame = get_frame()
     state.frame = frame
+    trace = RobotTrace(state)
+    trace.step( "camera start")
 
     if frame is None:
         state.camera_fail_count += 1
         state.error_message = "camera frame is None"
         state.target_detected = False
+
+        if state.camera_fail_count == 1:
+            send_alert("Camera failed: frame is None",
+                       level = "ERROR",
+                       key = "camera_fail")
     else:
         state.camera_fail_count = 0
         state.error_message = None
         state.frame_height, state.frame_width = frame.shape[:2]
+        trace.step("detect start")
         detect_target(state)
+        trace.step("detect done", f"target={state.target_detected}")
 
+    trace.step("memory start")
     update_memory(state)
+    trace.step("memory done", f"lost={state.lost_count}")
 
     # Level 3: cập nhật trạng thái vật cản
+    trace.step("obstacle start")
     update_obstacle_state(state)
+    trace.step("obstacle done", f"obstacle={state.obstacle_detected}")
 
+    trace.step("decision start")
     new_mode = decide_mode(state)
+    trace.step("decision done", f"mode={new_mode} reason={state.decision_reason}")
 
-    if new_mode != state.mode:
-        logger.info(f"[STATE] {state.mode} -> {new_mode}")
+    old_mode= state.mode
+    if state.voice_active:
+        state.mode = "manual"
+    else:
+        state.mode = new_mode
 
-    state.mode = new_mode
+    if old_mode != state.mode:
+        logger.info(f"[STATE] {old_mode} -> {state.mode}")
 
     handler = MODE_HANDLERS.get(state.mode, error_step)
     handler(state)
@@ -74,9 +95,11 @@ def run_step(state):
 
     logger.info(
         f"[RUN] mode={state.mode} "
+        f"reason={state.decision_reason}"
         f"target={state.target_detected} "
         f"lost={state.lost_count} "
         f"obstacle={state.obstacle_detected} "
+        f"obstacle_level={state.obstacle_level}"
         f"distance={state.distance_cm} "
         f"cmd={state.move_command} "
         f"speed={state.move_speed} "

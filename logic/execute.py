@@ -22,7 +22,7 @@ def apply_output(state):
 
         elif MODE == "PRODUCTION":
             from hardware import servo, motor
-            logger.info(f"[PRODUCTION] pan={state.pan_angle} tilt={state.tilt_angle} cmd={state.move_command} speed={state.move_speed}")
+            logger.info(f"[PRODUCTION] robot_mode={state.mode} pan={state.pan_angle} tilt={state.tilt_angle} cmd={state.move_command} speed={state.move_speed}")
             servo.set_pan(state.pan_angle)
             servo.set_tilt(state.tilt_angle)
             motor.apply_motor_command(state.move_command, state.move_speed)

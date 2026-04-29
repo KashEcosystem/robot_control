@@ -34,8 +34,10 @@ def tracking_step(state):
         if abs(error_x) > 20:
             if error_x > 0:
                 state.move_command = "right"
+                state.action_reason = "align target right"
             else:
                 state.move_command = "left"
+                state.action_reason = "align target left"
 
             target_speed = min(int(abs(error_x)*0.4), 100)
             state.move_speed = int(state.prev_speed * 0.7 + target_speed * 0.3)
@@ -46,24 +48,29 @@ def tracking_step(state):
             if state.target_area < TARGET_AREA_FAR:
                 state.move_command = "forward"
                 state.move_speed = HIGH_SPEED
+                state.action_reason = "target_far_forward_fast"
 
             elif state.target_area < TARGET_AREA_MEDIUM:
                 state.move_command = "forward"
                 state.move_speed = MEDIUM_SPEED
+                state.action_reason = "target_medium_forward"
 
             elif state.target_area < TARGET_AREA_NEAR:
                 state.move_command = "forward"
                 state.move_speed = LOW_SPEED
+                state.action_reason = "target_neae_forward_low"
 
             else:
                 state.move_command = "stop"
                 state.move_speed = 0
+                state.action_reason = "target_close_stop"
 
         logger.info(
             f"[TRACK] x={state.target_x} y={state.target_y} "
             f"error_x={error_x} error_y={error_y} "
             f"area={state.target_area} "
             f"cmd={state.move_command} speed={state.move_speed}"
+            f"reason={state.action_reason}"
         )
 
     except Exception:

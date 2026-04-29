@@ -36,3 +36,7 @@ class RobotState:
     last_move_command: str = "stop"
     last_move_speed: int = 0
     camera_fail_count: int = 0
+    trace_id = 0
+    decision_reason: str = ""
+    action_reason: str = ""
+    obstacle_level: str = "clear"

@@ -13,8 +13,8 @@ settings = Settings()
 
 
 # TEST MODE
-MODE = "SIMULATION"
-#MODE = "SAFE"
+#MODE = "SIMULATION"
+MODE = "SAFE"
 # MODE = "PRODUCTION"
 #===================
 
@@ -24,7 +24,7 @@ PAN_MAX = 140
 TILT_MIN = 70
 TILT_MAX = 110
 PAN_DEFAULT = 90
-TILT_DEFAULT = 90
+TILT_DEFAULT = 150
 #=====================
 
 
@@ -50,6 +50,7 @@ STOP_SPEED = 0
 SCAN_PAN_STEP = 2
 SCAN_TILT_STEP = 4
 SCAN_DIRECTION = 1
+SCAN_MOVE_SPEED = 8
 DELAY = 0.5
 #=======================
 
@@ -65,3 +66,12 @@ MIN_TARGET_AREA = 500
 TARGET_AREA_FAR = 2500
 TARGET_AREA_MEDIUM = 8000
 TARGET_AREA_NEAR =18000
+#======================
+
+# OBSTACLE
+
+OBSTACLE_DISTANCE_CM = 20
+DANGER_DISTANCE_CM = 10
+AVOID_SPEED = 25
+DANGER_SPEED = 15
+#=====================
