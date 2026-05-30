@@ -40,3 +40,9 @@ class RobotState:
     decision_reason: str = ""
     action_reason: str = ""
     obstacle_level: str = "clear"
+
+    voice_command: str = "none"
+    voice_active: bool = False
+    voice_text: str = ""
+    voice_confidence: float = 0.0
+    

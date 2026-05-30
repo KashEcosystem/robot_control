@@ -43,13 +43,3 @@ def build_voice_response(state) -> str:
         return "Tôi không thể tạo phản hồi lúc này."
 
 
-def speak_response(state) -> None:
-    """
-    Hiện tại chưa có loa/TTS thật nên chỉ log/print.
-    Sau này thay print bằng text-to-speech.
-    """
-
-    response = build_voice_response(state)
-
-    logger.info(f"[VOICE_RESPONSE] {response}")
-    print(f"ROBOT: {response}")

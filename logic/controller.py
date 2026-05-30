@@ -10,8 +10,11 @@ from logic.visualize import draw_debug
 from logic.execute import apply_output
 from core.alert import send_alert
 from core.trace import RobotTrace
+from voice.voice_service import VoiceService
 
 from core.logger_config import logger
+
+voice_service = VoiceService()
 
 
 def tracking_memory_step(state):
@@ -29,12 +32,22 @@ def error_step(state):
     state.move_command = "stop"
     state.move_speed = 0
 
+def manual_step(state):
+    state.move_command = state.voice_command
+    state.move_speed = 25
+
+def idle_step(state):
+    state.move_command = "stop"
+    state.move_speed = 0
+
 
 MODE_HANDLERS = {
     "tracking": tracking_step,
     "tracking_memory": tracking_memory_step,
     "scan": scan_step,
     "avoid_obstacle": avoid_obstacle_step,
+    "manual": manual_step,
+    "idle": idle_step,
     "error": error_step,
 }
 
@@ -71,15 +84,20 @@ def run_step(state):
     update_obstacle_state(state)
     trace.step("obstacle done", f"obstacle={state.obstacle_detected}")
 
+    trace.step("voice start")
+    voice_state = voice_service.listen_and_process()
+    state.voice_active = voice_state.active
+    state.voice_text = voice_state.text
+    state.voice_command = voice_state.command
+    state.voice_confidence = voice_state.confidence
+    trace.step("voice done", f"active={state.voice_active} command={state.voice_command}")
+
     trace.step("decision start")
+    old_mode = state.mode
     new_mode = decide_mode(state)
+    state.mode = new_mode
     trace.step("decision done", f"mode={new_mode} reason={state.decision_reason}")
 
-    old_mode= state.mode
-    if state.voice_active:
-        state.mode = "manual"
-    else:
-        state.mode = new_mode
 
     if old_mode != state.mode:
         logger.info(f"[STATE] {old_mode} -> {state.mode}")
@@ -96,6 +114,8 @@ def run_step(state):
     logger.info(
         f"[RUN] mode={state.mode} "
         f"reason={state.decision_reason}"
+        f"voice_active={state.voice_active}"
+        f"voice_cmd={state.voice_command}"
         f"target={state.target_detected} "
         f"lost={state.lost_count} "
         f"obstacle={state.obstacle_detected} "

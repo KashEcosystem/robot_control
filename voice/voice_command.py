@@ -7,7 +7,7 @@ def parse_voice_command(text: str) -> VoiceState:
     if not text:
         voice.command = "none"
         voice.active = False
-        return voice
+        return voicep
 
     if "stop" in text or "dừng" in text:
         voice.command = "stop"
